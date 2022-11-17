@@ -1,1 +1,27 @@
-
+﻿global using System.Data;
+global using System.Reflection;
+global using System.Text;
+global using System.Text.RegularExpressions;
+global using System.Diagnostics;
+global using System.Net;
+global using System.ComponentModel.DataAnnotations;
+global using ci_automation_apitester.RestApi;
+global using ci_automation_apitester.Objects;
+global using ci_automation_apitester.Queries;
+global using ci_automation_apitester.Interface;
+global using ci_automation_apitester.Libs;
+global using static ci_automation_apitester.Objects.TestAttributes;
+global using static ci_automation_apitester.Objects.TestObjects;
+global using static ci_automation_apitester.Libs.Authentication;
+global using ci_common_qa_automation.Utilities;
+global using ci_common_qa_automation.BaseObjects;
+global using Newtonsoft.Json;
+global using Newtonsoft.Json.Linq;
+global using Microsoft.AspNetCore.JsonPatch;
+global using Fclp;
+global using Microsoft.Extensions.Configuration;
+global using Azure.Core;
+global using Azure.Identity;
+global using Azure.Security.KeyVault.Secrets;
+global using FluentAssertions;
+//global using ci_metadata_api_models;
