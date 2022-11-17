@@ -1,31 +1,21 @@
 ﻿namespace ci_automation_apitester.ApiDto.IntegrationMetadata
 {
-    public class Integration : BaseRestApi
+    public class IntegrationType : BaseRestApi
     {
-        const string Endpoint = "/api/Integration";
+        const string Endpoint = "/api/IntegrationType";
         public Dto CurrentObject = new();
 
         public class Dto
         {
             [UrlTest("GET", "99999999-9999-9999-9999-999999999999", 404, "Sequence contains no elements", "Id Doesn't Exist")]
-            [UrlTest("GET", "87130460-06B8-4A4B-9F0E-FEE5D05A7335", 404, "Sequence contains no elements", "Id Casing Mismatch")]
+            [UrlTest("GET", "8CB217A3-9EE5-4527-AA16-2C6E1AA654FE", 404, "Sequence contains no elements", "Id Casing Mismatch")]
             public string Id { get; set; }
             public string Name { get; set; }
-            public string Description { get; set; }
-            public string IntegrationTypeId { get; set; }
-            public string IntegrationDirection { get; set; }
-            public int MaxFilesPerRun { get; set; }
-            public string DefaultScheduleId { get; set; }
 
             public Dto()
             {
                 Id = Guid.NewGuid().ToString().ToUpper();
                 Name = "";
-                Description = "";
-                IntegrationTypeId = "";
-                IntegrationDirection = "";
-                MaxFilesPerRun = 10;
-                DefaultScheduleId = "";
             }
         }
         public override string GetUrl(string action)
@@ -33,9 +23,8 @@
             switch (action)
             {
                 case "GET":                         //Endpoint - returns all; Endpoint + "/Id" - returns specific
-                    return Endpoint;
                 case "GETQuery":
-                    return Endpoint + "/";         //api/Integreation/{IntegrationId}
+                    return Endpoint + "/";         //api/IntegreationType/{IntegrationTypeId}
                 case "AttributeUrlTest":
                     return Endpoint + "/";
                 default: return Endpoint;
@@ -56,24 +45,24 @@
 
             TestParams.RequestType = "GET";
 
-            DataTable allIntegrationDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), query.QueryAllIntegration(SecretsManager.SnowflakeDatabaseEnvironment()));
+            DataTable allIntegrationTypeDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), query.QueryAllIntegrationType(SecretsManager.SnowflakeDatabaseEnvironment()));
 
-            //Returns all Integrations in dbo.Integrations (for GET /api/Integration)
-            string expectedGetAllResponseBody = JsonConvert.SerializeObject(allIntegrationDt);
-            TestParams.TestStepName = GetType().Name + "_GET_AllIntegration";
+            //Returns all IntegrationType in dbo.IntegrationType (for GET /api/IntegrationType)
+            string expectedGetAllResponseBody = JsonConvert.SerializeObject(allIntegrationTypeDt);
+            TestParams.TestStepName = GetType().Name + "_GET_AllIntegrationType";
             TestParams.Url = GetUrl("GET");
             TestParams.ExpectedResponseBody = expectedGetAllResponseBody;
             testParamsList.Add(TestParams.Copy());
 
-            //Returns specific Integration in dbo.Integrations (for GET /api/Integration/{IntegrationId})
-            for (int rowIndex = 0; rowIndex < allIntegrationDt.Rows.Count; rowIndex++)
+            //Returns specific IntegrationType in dbo.IntegrationType (for GET /api/IntegrationType/{IntegrationTypeId})
+            for (int rowIndex = 0; rowIndex < allIntegrationTypeDt.Rows.Count; rowIndex++)
             {
-                JArray jArray = JArray.FromObject(allIntegrationDt, JsonSerializer.CreateDefault());
+                JArray jArray = JArray.FromObject(allIntegrationTypeDt, JsonSerializer.CreateDefault()); 
 
                 JToken rowJToken = jArray[rowIndex];
                 string rowJson = rowJToken.ToString(Formatting.None);
 
-                TestParams.TestStepName = GetType().Name + "_GET_IntegrationById_" + rowJToken["ID"];
+                TestParams.TestStepName = GetType().Name + "_GET_IntegrationTypeById_" + rowJToken["ID"];
                 TestParams.Url = GetUrl("GETQuery") + rowJToken["ID"].ToString();
                 TestParams.ExpectedResponseBody = rowJson;
                 testParamsList.Add(TestParams.Copy());
