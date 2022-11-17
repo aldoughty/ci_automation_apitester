@@ -1,20 +1,20 @@
 ﻿namespace ci_automation_apitester.Environment
 {
-    public class DataTagging : IEnvironment
+    public class TenantMetadata : IEnvironment
     {
         public string GetBaseUrl(string environment)
         {
             switch (environment.ToLower())
             {
                 case "production":
-                    return "https://api-shareddev-mgmt.azure-api.net";
                 case "stage":
                 case "staging":
-                    return "https://api-shareddev-mgmt.azure-api.net";
                 case "test":
-                    return "https://api-shareddev-mgmt.azure-api.net";
-                default: //Assume Dev
-                    return "https://api-shareddev-mgmt.azure-api.net";
+                    return "https://as-test-tenantmetadataservice.azurewebsites.net";
+                case "dev":
+                    return "https://as-dev-tenantmetadataservice.azurewebsites.net";
+                default: //Assume Test
+                    return "https://as-test-tenantmetadataservice.azurewebsites.net";
             }
         }
         public string GetAuthenticationToken(string environment)
@@ -24,17 +24,6 @@
         public string GetApiKey(string environment)
         {
             return Authentication.GetApiKey(environment);
-        }
-        public List<string> GetAuthTypes()
-        {
-            List<string> authTypes = new List<string>
-            { "Bearer" };
-
-            return authTypes;
-        }
-        public string GetCurrentAuth()
-        {
-            return "bearer";
         }
         public string GetAuthentication(string environment)
         {
@@ -51,6 +40,17 @@
                     break;
             }
             return authValue;
+        }
+        public List<string> GetAuthTypes()
+        {
+            List<string> authTypes = new List<string>
+            { "BearerApiKey" };  //Note:  TenantMetadata endpoints allow both Bearer Token and ApiKey so it will always auth as long as one is valid.
+
+            return authTypes;
+        }
+        public string GetCurrentAuth()
+        {
+            return "apikey";
         }
     }
 }
