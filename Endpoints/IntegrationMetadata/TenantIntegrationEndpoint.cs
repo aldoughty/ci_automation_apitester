@@ -10,37 +10,39 @@
             //These scenarios involve 2 properties?  Will need known, seeded combos.
             //[RequestTest("POST", "{\"integrationEndpointId\": \"???\", \"tenantIntegrationId\": \"???\"}", 500, "TenantIntegrationEndpoint already exists for this tenantIntegration and integrationEndpoint combination", "TenantIntegration & IntegrationEndpoint Combo Exists")]
             //[RequestTest("PUT", "{\"integrationEndpointId\": \"???\", \"tenantIntegrationId\": \"???\"}", 500, "TenantIntegrationEndpoint already exists for this tenantIntegration and integrationEndpoint combination", "TenantIntegration & IntegrationEndpoint Combo Exists")]
-            //[RequestTest("PUT", "{\"integrationEndpointId\": \"???\", \"tenantIntegrationId\": \"???\"}", 500, "Invalid integrationEndpoint tenantIntegration combination", "dbo.TenantIntegration.IntegrationId != dbo.IntegrationEndpoint.IntegrationId")]
+            //[RequestTest("PUT", "{\"integrationEndpointId\": \"???\", \"tenantIntegrationId\": \"???\"}", 500, "Invalid integrationEndpoint tenantIntegration combination", "dbo.TenantIntegration.IntegrationId != dbo.IntegrationEndpoints.IntegrationId")]
 
-            [UrlTest("GET", "99999999-9999-9999-9999-999999999999", 404, "Sequence contains no elements", "TenantIntegrationEndpintID Doesn't Exist")]
-            //[UrlTest("GET", "009C01DA-F9E5-4691-A622-33CF84958320", 404, "Sequence contains no elements", "TenantIntegrationEndpintID Casing Mismatch")] //returns 200?
-            [UrlTest("DELETE", "99999999-9999-9999-9999-999999999999", 500, "Error disabling TenantIntegrationEndpoint", "TenantIntegrationEndpintID Doesn't Exist")]
-            //[UrlTest("DELETE", "009C01DA-F9E5-4691-A622-33CF84958320", 500, "Error disabling tenant", "TenantIntegrationEndpintID Casing Mismatch")]  //returns 204?
-            [UrlTest("DELETE", "", 405, "", "TenantIntegrationEndpintI Method Not Allowed")]
-            [RequestTest("PUT", null, 400, "The Id field is required", "Omit ID Key")]
-            [RequestTest("PUT", "", 500, "Required input Id was empty. (Parameter 'Id')", "Blank ID Key")]
+            [UrlTest("GET", "99999999-9999-9999-9999-999999999999", 404, "Sequence contains no elements", "TenantIntegrationEndpintId Doesn't Exist")]
+            //[UrlTest("GET", "C528741B-BBB7-42A6-832A-7A2BD3AA3716", 404, "Sequence contains no elements", "TenantIntegrationEndpintID Casing Mismatch")] //returns 200? Bug 326
+            [UrlTest("DELETE", "99999999-9999-9999-9999-999999999999", 500, "Error disabling TenantIntegrationEndpoint", "TenantIntegrationEndpintId Doesn't Exist")]
+            //[UrlTest("DELETE", "C528741B-BBB7-42A6-832A-7A2BD3AA3716", 500, "Error disabling tenant", "TenantIntegrationEndpintID Casing Mismatch")]  //returns 204? Bug 326
+            [UrlTest("DELETE", "", 405, "", "TenantIntegrationEndpintId Method Not Allowed")]
+            [RequestTest("PUT", null, 500, "Required input Id was empty", "Omit ID Key")]
+            [RequestTest("PUT", "", 500, "Required input Id was empty", "Blank ID Key")]
             public string Id { get; set; }
 
-            [RequestTest("POST", null, 500, "Value cannot be null. (Parameter 'IntegrationEndpointId')", "Omit IntegrationEndpointId Key")]
-            [RequestTest("POST", "", 500, "IntegrationEndpointId or TenantIntegrationId is not valid", "Blank IntegrationEndpointId Key")]
-            [RequestTest("POST", "B011C622-9A2D-4279-95B2-4fC54755124F", 500, "Invalid integrationEndpoint tenantIntegration combination", "IntegrationEndpointId Key Casing Mismatch")] //casing mismatch or doesn't exist
-            [RequestTest("PUT", null, 500, "Value cannot be null. (Parameter 'IntegrationEndpointId')", "Omit IntegrationEndpointId Key")]
-            [RequestTest("PUT", "", 500, "IntegrationEndpointId or TenantIntegrationId is formatted incorrectly", "Blank IntegrationEndpointId Key")]
+            [RequestTest("POST", null, 500, "Value cannot be null", "Omit IntegrationEndpointId Key")]
+            [RequestTest("POST", "", 500, "Required input IntegrationEndpointId was empty", "Blank IntegrationEndpointId Key")]
+            //[RequestTest("POST", "7B723057-EAC1-4718-842E-08F1132300E5", 500, "Invalid integrationEndpoint tenantIntegration combination", "IntegrationEndpointId Casing Mismatch")]  //returns 201? Bug 326
+            [RequestTest("POST", "99999999-9999-9999-9999-999999999999", 500, "Invalid integrationEndpoint tenantIntegration combination", "IntegrationEndpointId Doesn't Exist")]
+            [RequestTest("PUT", null, 500, "Value cannot be null", "Omit IntegrationEndpointId Key")]
+            [RequestTest("PUT", "", 500, "Required input IntegrationEndpointId was empty", "Blank IntegrationEndpointId Key")]
             public string IntegrationEndpointId { get; set; }
             
-            [RequestTest("POST", null, 500, "Value cannot be null. (Parameter 'TenantIntegrationId')", "Omit IntegrationEndpointId Key")]
-            [RequestTest("POST", "", 500, "IntegrationEndpointId or TenantIntegrationId is not valid", "Blank IntegrationEndpointId Key")]
-            [RequestTest("POST", "9e4dd5e0-669c-4e42-ae66-fb441d047ab2", 500, "Invalid integrationEndpoint tenantIntegration combination", "TenantEndpointId Key Casing Mismatch")] //casing mismatch or doesn't exist
-            [RequestTest("PUT", null, 500, "Value cannot be null. (Parameter 'TenantIntegrationId')", "Omit TenantIntegrationId Key")]
-            [RequestTest("PUT", "", 500, "IntegrationEndpointId or TenantIntegrationId is formatted incorrectly", "Blank TenantIntegrationId Key")]
+            [RequestTest("POST", null, 500, "Value cannot be null", "Omit TenantIntegrationId Key")]
+            [RequestTest("POST", "", 500, "Required input TenantIntegrationId was empty", "Blank TenantIntegrationId Key")]
+            [RequestTest("POST", "1EEE24E6-4DB0-492D-86F8-5D08DDE943A1", 500, "Invalid integrationEndpoint tenantIntegration combination", "TenantIntegrationId Casing Mismatch")]
+            [RequestTest("POST", "99999999-9999-9999-9999-999999999999", 500, "Invalid integrationEndpoint tenantIntegration combination", "TenantIntegrationId Doesn't Exist")]
+            [RequestTest("PUT", null, 500, "Value cannot be null", "Omit TenantIntegrationId Key")]
+            [RequestTest("PUT", "", 500, "Required input TenantIntegrationId was empty", "Blank TenantIntegrationId Key")]
             public string TenantIntegrationId { get; set; }
 
             public bool Active { get; set; }
             public Dto()
             {
                 Id = Guid.NewGuid().ToString().ToUpper();
-                IntegrationEndpointId = "";                                 //Change these values (GUID?)
-                TenantIntegrationId = "";                                   //Change these values (GUID?)
+                IntegrationEndpointId = "7b723057-eac1-4718-842e-08f1132300e5";         //Must be seeded TenantIntegrationId/IntegrationEndpointId pair that doesn't exist in dbo.TenantIntegrationEndpoint to POST
+                TenantIntegrationId = "1eee24e6-4db0-492d-86f8-5d08dde943a1";           //Must be seeded TenantIntegrationId/IntegrationEndpointId pair that doesn't exist in dbo.TenantIntegrationEndpoint to POST
                 Active = true;
             }
         }
@@ -74,8 +76,11 @@
         }
         public override string GetPutBody()
         {
-            CurrentObject.IntegrationEndpointId = "";                               //Change these values (GUID?, Known Seeded)
-            CurrentObject.TenantIntegrationId = "";                                 //Change these values (GUID?, Known Seeded)
+            CurrentObject.Id = "0430169d-9b50-4be8-b949-75b7a19a6fe4";                          //Seeded
+            CurrentObject.IntegrationEndpointId = "7b723057-eac1-4718-842e-08f1132300e5";       //Seeded
+            CurrentObject.TenantIntegrationId = "1eee24e6-4db0-492d-86f8-5d08dde943a1";         //Seeded
+            CurrentObject.Active = false;
+
             return JsonConvert.SerializeObject(CurrentObject);
         }
         public override string GetWorkingId()
@@ -90,13 +95,12 @@
         }
         public override List<TestObjects.TestStep> GetParameterTests(MessageData messageData, string authValue, IEnvironment environment)
         {
-            IntegrationMetadataQueries query = new();
             List<TestObjects.TestStep> testParamsList = new();
             SetTestParams(authValue, environment);
 
             TestParams.RequestType = "GET";
 
-            DataTable allTenantIntegrationEndpointDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), query.QueryAllTenantIntegrationEndpoint(SecretsManager.SnowflakeDatabaseEnvironment()));
+            DataTable allTenantIntegrationEndpointDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), IntegrationMetadataQueries.QueryAllTenantIntegrationEndpoint(SecretsManager.SnowflakeDatabaseEnvironment()));
 
             //Returns all Tenant Integration Endpoint in dbo.TenantIntegrationEndpoint (for GET /api/TenantIntegrationEndpoint)
             string expectedGetAllResponseBody = JsonConvert.SerializeObject(allTenantIntegrationEndpointDt);

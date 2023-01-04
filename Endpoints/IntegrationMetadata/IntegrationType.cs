@@ -39,13 +39,12 @@
         }
         public override List<TestObjects.TestStep> GetParameterTests(MessageData messageData, string authValue, IEnvironment environment)
         {
-            IntegrationMetadataQueries query = new();
             List<TestObjects.TestStep> testParamsList = new();
             SetTestParams(authValue, environment);
 
             TestParams.RequestType = "GET";
 
-            DataTable allIntegrationTypeDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), query.QueryAllIntegrationType(SecretsManager.SnowflakeDatabaseEnvironment()));
+            DataTable allIntegrationTypeDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), IntegrationMetadataQueries.QueryAllIntegrationType(SecretsManager.SnowflakeDatabaseEnvironment()));
 
             //Returns all IntegrationType in dbo.IntegrationType (for GET /api/IntegrationType)
             string expectedGetAllResponseBody = JsonConvert.SerializeObject(allIntegrationTypeDt);

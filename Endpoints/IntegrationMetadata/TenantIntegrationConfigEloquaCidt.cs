@@ -98,13 +98,12 @@
         }
         public override List<TestObjects.TestStep> GetParameterTests(MessageData messageData, string authValue, IEnvironment environment)
         {
-            IntegrationMetadataQueries query = new();
             List<TestObjects.TestStep> testParamsList = new();
             SetTestParams(authValue, environment);
 
             TestParams.RequestType = "GET";
 
-            DataTable allTenantIntegrationConfigEloquaCidtsDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), query.QueryAllTenantIntegrationConfigEloquaCIDT(SecretsManager.SnowflakeDatabaseEnvironment()));
+            DataTable allTenantIntegrationConfigEloquaCidtsDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), IntegrationMetadataQueries.QueryAllTenantIntegrationConfigEloquaCIDT(SecretsManager.SnowflakeDatabaseEnvironment()));
 
             //Returns all Tenant Integration Config Eloqua CIDTs in dbo.TenantIntegrationConfig_Eloqua_Cidt (for GET /api/TenantIntegrationConfigEloquaCidt)
             string expectedGetAllResponseBody = JsonConvert.SerializeObject(allTenantIntegrationConfigEloquaCidtsDt);

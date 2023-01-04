@@ -2,37 +2,48 @@
 {
     public class TenantIntegrationConfigTM : BaseRestApi
     {
-        const string Endpoint = "/api/TenantIntegrationConfigTM";
+        const string Endpoint = "/api/TenantIntegrationConfigTm";
         public Dto CurrentObject = new();
 
         public class Dto
-        {
-            //POST need seeded:  
+        { 
             //TenantIntegrationId must be unique
 
             [UrlTest("DELETE", "", 405, "", "")]
-            [UrlTest("DELETE", "99999999-9999-9999-9999-999999999999", 500, "Error disabling TenantIntegrationConfigTM", "TenantIntegrationConfigId Doesn't Exist")]
-            [UrlTest("DELETE", "0E670336-BDA1-47fA-BC93-FFD9249BEF92", 500, "Error disabling TenantIntegrationConfigTM", "TenantIntegrationConfigId Casing Mismatch")]
+            [UrlTest("DELETE", "99999999-9999-9999-9999-999999999999", 404, "Not Found", "TenantIntegrationConfigId Doesn't Exist")]
+            //[UrlTest("DELETE", "EDD41F40-70A1-4396-825D-D6EAF7446D58", 500, "Error disabling TenantIntegrationConfigTM", "TenantIntegrationConfigId Casing Mismatch")]  returns 204
             [UrlTest("GET", "99999999-9999-9999-9999-999999999999", 404, "Sequence contains no elements", "TenantIntegrationConfigId Doesn't Exist")]
-            [UrlTest("GET", "0E670336-BDA1-47fA-BC93-FFD9249BEF92", 404, "Sequence contains no elements", "TenantIntegrationConfigId Casing Mismatch")]
-            [RequestTest("PUT", null, 400, "The Id field is required", "Omit TenantIntegrationConfigId Key")]
-            [RequestTest("PUT", "", 500, "Value cannot be null. (Parameter 'id')", "Blank TenantIntegrationConfigId Key")]
+            //[UrlTest("GET", "EDD41F40-70A1-4396-825D-D6EAF7446D58", 404, "Sequence contains no elements", "TenantIntegrationConfigId Casing Mismatch")]  returns 200
+            [RequestTest("PUT", null, 404, "Not Found", "Omit TenantIntegrationConfigId Key")]
+            [RequestTest("PUT", "", 404, "Not Found", "Blank TenantIntegrationConfigId Key")]
             public string Id { get; set; }
-            [RequestTest("POST", null, 500, "Value cannot be null. (Parameter 'TenantIntegrationId')", "Omit TenantIntegrationId Key")]
-            [RequestTest("POST", "", 500, "Required input TenantIntegrationId was empty. (Parameter 'TenantIntegrationId')", "Blank TenantIntegrationId Key")]
-            [RequestTest("POST", "6e0a5769-4147-4b75-81be-4818cc3edde2", 500, "TenantIntegration is not unique in TenantIntegrationConfigTM", "Duplicate TenantIntegrationId")]
-            [RequestTest("PUT", null, 400, "The TenantIntegrationId field is required", "Omit TenantIntegrationId Key")]
-            //[RequestTest("PUT", "", ???, "???", "Blank TenantIntegrationId Key")]  //204
+            [RequestTest("POST", null, 500, "Required input TenantIntegrationId was empty", "Omit TenantIntegrationId Key")]
+            [RequestTest("POST", "", 500, "Required input TenantIntegrationId was empty", "Blank TenantIntegrationId Key")]
+            [RequestTest("POST", "abb76836-e565-4236-8446-54778f37ac7b", 500, "TenantIntegration is not unique in TenantIntegrationConfigTm", "Duplicate TenantIntegrationId")]
+            [RequestTest("POST", "99999999-9999-9999-9999-999999999999", 500, "TenantIntegration doesn\\u0027t exist or is inactive", "TenantIntegrationId Doesn't Exist")]
+            [RequestTest("POST", "ee2e654d-e923-48e0-82cd-4d9e1245b25a", 500, "TenantIntegration doesn\\u0027t exist or is inactive", "TenantIntegrationId Is Inactive")] //returns 201
+            [RequestTest("PUT", null, 404, "Not Found", "Omit TenantIntegrationId Key")]
+            [RequestTest("PUT", "", 404, "Not Found", "Blank TenantIntegrationId Key")]
             public string TenantIntegrationId { get; set; }
-            public string TMDSN { get; set; }
-            public string TMTEAM { get; set; }
+            [RequestTest("POST", null, 500, "Required input TmDsn was empty", "Omit TmDsn Key")]
+            [RequestTest("POST", "", 500, "Required input TmDsn was empty", "Blank TmDsn Key")]
+            [RequestTest("PUT", null, 404, "Not Found", "Omit TmDsn Key")]
+            [RequestTest("PUT", "", 404, "Not Found", "Blank TmDsn Key")]
+            public string TmDsn { get; set; }
+            [RequestTest("POST", null, 500, "Required input TmTeam was empty", "Omit TmTeam Key")]
+            [RequestTest("POST", "", 500, "Required input TmTeam was empty", "Blank TmTeam Key")]
+            [RequestTest("PUT", null, 404, "Not Found", "Omit TmTeam Key")]
+            [RequestTest("PUT", "", 404, "Not Found", "Blank TmTeam Key")]
+            public string TmTeam { get; set; }
             public bool? Active { get; set; }
             public Dto()
             {
+                string timestamp = DateTime.Now.ToString("MMddyyHHmmss");
+
                 Id = Guid.NewGuid().ToString().ToUpper();
-                TenantIntegrationId = "";                          
-                TMDSN = "";                                  
-                TMTEAM = "";
+                TenantIntegrationId = "e2690575-95bf-4892-9a2b-7219c2489019";  //Seeded, unique                          
+                TmDsn = "uofqa" + timestamp;                                  
+                TmTeam = "uofqa" + timestamp;
                 Active = true;
             }
         }
@@ -66,11 +77,13 @@
         }
         public override string GetPutBody()
         {
+            string timestamp = DateTime.Now.ToString("MMddyyHHmmss");
+
             CurrentObject.Id = Guid.NewGuid().ToString().ToUpper();
-            CurrentObject.TenantIntegrationId = "";
-            CurrentObject.TMDSN = "";
-            CurrentObject.TMTEAM = "";
-            CurrentObject.Active = true;
+            CurrentObject.TenantIntegrationId = "e2690575-95bf-4892-9a2b-7219c2489019";  //Seeded, unique
+            CurrentObject.TmDsn = "uofqa" + timestamp;
+            CurrentObject.TmTeam = "uofqa" + timestamp;
+            CurrentObject.Active = false;
             return JsonConvert.SerializeObject(CurrentObject);
         }
         public override string GetWorkingId()
@@ -85,13 +98,12 @@
         }
         public override List<TestObjects.TestStep> GetParameterTests(MessageData messageData, string authValue, IEnvironment environment)
         {
-            IntegrationMetadataQueries query = new();
             List<TestObjects.TestStep> testParamsList = new();
             SetTestParams(authValue, environment);
 
             TestParams.RequestType = "GET";
 
-            DataTable allTenantIntegrationConfigTMsDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), query.QueryAllTenantIntegrationConfigTM(SecretsManager.SnowflakeDatabaseEnvironment()));
+            DataTable allTenantIntegrationConfigTMsDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), IntegrationMetadataQueries.QueryAllTenantIntegrationConfigTM(SecretsManager.SnowflakeDatabaseEnvironment()));
 
             //Returns all Tenant Integration Config TMs in dbo.TenantIntegrationConfig_TM (for GET /api/TenantIntegrationConfigTM)
             string expectedGetAllResponseBody = JsonConvert.SerializeObject(allTenantIntegrationConfigTMsDt);

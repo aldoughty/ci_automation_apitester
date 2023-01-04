@@ -5,6 +5,8 @@
         const string Endpoint = "/api/Integration";
         public Dto CurrentObject = new();
 
+        //Negative validation GETS for values that aren't a part of the DTO?
+
         public class Dto
         {
             [UrlTest("GET", "99999999-9999-9999-9999-999999999999", 404, "Sequence contains no elements", "Id Doesn't Exist")]
@@ -35,7 +37,9 @@
                 case "GET":                         //Endpoint - returns all; Endpoint + "/Id" - returns specific
                     return Endpoint;
                 case "GETQuery":
-                    return Endpoint + "/";         //api/Integreation/{IntegrationId}
+                    return Endpoint + "/";         //api/Integration/{IntegrationId}
+                case "GETTenantQuery":
+                    return Endpoint + "/tenantid/";         //api/Integration/tenantid/{TenantId}
                 case "AttributeUrlTest":
                     return Endpoint + "/";
                 default: return Endpoint;
@@ -50,13 +54,12 @@
         }
         public override List<TestObjects.TestStep> GetParameterTests(MessageData messageData, string authValue, IEnvironment environment)
         {
-            IntegrationMetadataQueries query = new();
             List<TestObjects.TestStep> testParamsList = new();
             SetTestParams(authValue, environment);
 
             TestParams.RequestType = "GET";
 
-            DataTable allIntegrationDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), query.QueryAllIntegration(SecretsManager.SnowflakeDatabaseEnvironment()));
+            DataTable allIntegrationDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), IntegrationMetadataQueries.QueryAllIntegration(SecretsManager.SnowflakeDatabaseEnvironment()));
 
             //Returns all Integrations in dbo.Integrations (for GET /api/Integration)
             string expectedGetAllResponseBody = JsonConvert.SerializeObject(allIntegrationDt);
@@ -75,6 +78,20 @@
 
                 TestParams.TestStepName = GetType().Name + "_GET_IntegrationById_" + rowJToken["ID"];
                 TestParams.Url = GetUrl("GETQuery") + rowJToken["ID"].ToString();
+                TestParams.ExpectedResponseBody = rowJson;
+                testParamsList.Add(TestParams.Copy());
+            }
+
+            //Returns specific Integrations in dbo.Integrations by correlated TenantId in dbo.TenantIntegration (for GET /api/Integration/tenantid/{TenantId})
+            DataTable tenantIdDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), IntegrationMetadataQueries.QueryDistinctTenantIntegrationTenantId(SecretsManager.SnowflakeDatabaseEnvironment()));
+            foreach (DataRow row in tenantIdDt.Rows)
+            {
+                DataTable eachTenantIdDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), IntegrationMetadataQueries.QueryIntegrationByTenantId(SecretsManager.SnowflakeDatabaseEnvironment(), row.Field<string>("TenantId")));
+                JArray jArray = JArray.FromObject(eachTenantIdDt, JsonSerializer.CreateDefault());
+
+                TestParams.TestStepName = GetType().Name + "_GET_IntegrationByTenantId_" + row.Field<string>("TenantId");
+                TestParams.Url = GetUrl("GETTenantQuery") + row.Field<string>("TenantId").ToString();
+                string rowJson = jArray.ToString(Formatting.None);
                 TestParams.ExpectedResponseBody = rowJson;
                 testParamsList.Add(TestParams.Copy());
             }

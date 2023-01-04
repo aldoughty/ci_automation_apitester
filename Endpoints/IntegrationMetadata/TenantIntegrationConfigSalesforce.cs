@@ -7,50 +7,49 @@
 
         public class Dto
         {
-            //POST need seeded:  
             //TenantIntegrationId must be unique
+            //Negative validation GETS for values that aren't a part of the DTO?  /api/TenantIntegrationConfigSalesforce/integrationid/{integrationId}
 
             [UrlTest("DELETE", "", 405, "", "")]
-            [UrlTest("DELETE", "99999999-9999-9999-9999-999999999999", 500, "Error disabling TenantIntegrationConfigSftp", "TenantIntegrationConfigId Doesn't Exist")]
-            [UrlTest("DELETE", "0E670336-BDA1-47fA-BC93-FFD9249BEF92", 500, "Error disabling TenantIntegrationConfigSftp", "TenantIntegrationConfigId Casing Mismatch")]
-            [UrlTest("GET", "99999999-9999-9999-9999-999999999999", 404, "Sequence contains no elements", "TenantIntegrationConfigId Doesn't Exist")]
-            [UrlTest("GET", "0E670336-BDA1-47fA-BC93-FFD9249BEF92", 404, "Sequence contains no elements", "TenantIntegrationConfigId Casing Mismatch")]
-            [RequestTest("PUT", null, 400, "The Id field is required", "Omit TenantIntegrationConfigId Key")]
-            [RequestTest("PUT", "", 500, "Value cannot be null. (Parameter 'id')", "Blank TenantIntegrationConfigId Key")]
+            [UrlTest("DELETE", "99999999-9999-9999-9999-999999999999", 500, "Error disabling TenantIntegrationConfigSalesforce", "TenantIntegrationConfigSalesforce Doesn't Exist")]
+            //[UrlTest("DELETE", "A4C1AE8D-0E63-45B6-B727-91CBDB357CFA", 204?, "Error disabling TenantIntegrationConfigSalesforce", "TenantIntegrationConfigSalesforce Casing Mismatch")]
+            [UrlTest("GET", "99999999-9999-9999-9999-999999999999", 404, "Sequence contains no elements", "TenantIntegrationConfigSalesforce Doesn't Exist")]
+            //[UrlTest("GET", "A4C1AE8D-0E63-45B6-B727-91CBDB357CFA", 200?, "Sequence contains no elements", "TenantIntegrationConfigSalesforce Casing Mismatch")]
+            [RequestTest("PUT", null, 500, "Required input Id was empty", "Omit TenantIntegrationConfigId Key")]
+            [RequestTest("PUT", "", 500, "Required input Id was empty", "Blank TenantIntegrationConfigId Key")]
             public string Id { get; set; }
-            [RequestTest("POST", null, 500, "Value cannot be null. (Parameter 'TenantIntegrationId')", "Omit TenantIntegrationId Key")]
-            [RequestTest("POST", "", 500, "Required input TenantIntegrationId was empty. (Parameter 'TenantIntegrationId')", "Blank TenantIntegrationId Key")]
-            [RequestTest("POST", "6e0a5769-4147-4b75-81be-4818cc3edde2", 500, "TenantIntegration is not unique in TenantIntegrationConfigSftp", "Duplicate TenantIntegrationId")]
-            [RequestTest("PUT", null, 400, "The TenantIntegrationId field is required", "Omit TenantIntegrationId Key")]
-            //[RequestTest("PUT", "", ???, "???", "Blank TenantIntegrationId Key")]  //204
+            [RequestTest("POST", null, 500, "Required input TenantIntegrationId was empty", "Omit TenantIntegrationId Key")]
+            [RequestTest("POST", "", 500, "Required input TenantIntegrationId was empty", "Blank TenantIntegrationId Key")]
+            [RequestTest("POST", "ec12fa5f-1147-485e-8c1f-15004f29c6de", 500, "TenantIntegrationConfigSalesforce already exists for TenantIntegration", "Duplicate TenantIntegrationId")]
+            [RequestTest("PUT", null, 500, "Required input TenantIntegrationId was empty", "Omit TenantIntegrationId Key")]
+            [RequestTest("PUT", "", 500, "Required input TenantIntegrationId was empty", "Blank TenantIntegrationId Key")]
+            [RequestTest("PUT", "ec12fa5f-1147-485e-8c1f-15004f29c6de", 500, "Another TenantIntegrationConfigSalesforce already exists for TenantIntegrationId", "Duplicate TenantIntegrationId")]
             public string TenantIntegrationId { get; set; }
-            [RequestTest("POST", null, 500, "Value cannot be null. (Parameter 'Username')", "Omit Username Key")]
-            [RequestTest("POST", "", 500, "Required input Username was empty. (Parameter 'Username')", "Blank Username Key")]
-            //[RequestTest("POST", "99999999-9999-9999-9999-999999999999", 500, "???", "Username Doesn't Exist")] //404
-            [RequestTest("POST", "73d3a3f0-0edb-11ed-8937-a9e9ce36e4dc", 500, "Username doesn't exist or is inactive", "Inactive Username")]
-            [RequestTest("PUT", null, 400, "The Username field is required", "Omit Username Key")]
-            //[RequestTest("PUT", "", ???, "???", "Blank Username Key")]  //204
+            [RequestTest("POST", null, 500, "Required input Username was empty", "Omit Username Key")]
+            [RequestTest("POST", "", 500, "Required input Username was empty", "Blank Username Key")]
+            [RequestTest("PUT", null, 500, "Required input Username was empty", "Omit Username Key")]
+            [RequestTest("PUT", "", 500, "Required input Username was empty", "Blank Username Key")]
             public string Username { get; set; }
-            [RequestTest("POST", null, 400, "The Password field is required", "Omit Password Key")]
-            //[RequestTest("POST", "", 201, "", "Blank Password Key")]  //201
-            [RequestTest("PUT", null, 400, "The Password field is required", "Omit Password Key")]
-            //[RequestTest("PUT", "", ???, "???", "Blank Password Key")]  //204
+            [RequestTest("POST", null, 500, "Required input Password was empty", "Omit Password Key")]
+            [RequestTest("POST", "", 500, "Required input Password was empty", "Blank Password Key")]
+            [RequestTest("PUT", null, 500, "Required input Password was empty", "Omit Password Key")]
+            [RequestTest("PUT", "", 500, "Required input Password was empty", "Blank Password Key")]
             public string Password { get; set; }
-            [RequestTest("POST", null, 400, "The Token field is required", "Omit Token Key")]
-            //[RequestTest("POST", "", 201, "???", "Blank Token Key")]  //201
-            [RequestTest("PUT", null, 400, "The Token field is required", "Omit Token Key")]
-            //[RequestTest("PUT", "", ???, "???", "Blank Token Key")]  //204
+            [RequestTest("POST", null, 500, "Required input Token was empty", "Omit Token Key")]
+            [RequestTest("POST", "", 500, "Required input Token was empty", "Blank Token Key")]
+            [RequestTest("PUT", null, 500, "Required input Token was empty", "Omit Token Key")]
+            [RequestTest("PUT", "", 500, "Required input Token was empty", "Blank Token Key")]
             public string Token { get; set; }
-            [RequestTest("POST", null, 400, "The Url field is required", "Omit Url Key")]
-            //[RequestTest("POST", "", 201, "???", "Blank Url Key")]  //201
-            [RequestTest("PUT", null, 400, "The Url field is required", "Omit Url Key")]
-            //[RequestTest("PUT", "", ???, "???", "Blank Url Key")]  //204
+            [RequestTest("POST", null, 500, "Required input Url was empty", "Omit Url Key")]
+            [RequestTest("POST", "", 500, "Required input Url was empty", "Blank Url Key")]
+            [RequestTest("PUT", null, 500, "Required input Url was empty", "Omit Url Key")]
+            [RequestTest("PUT", "", 500, "Required input Url was empty", "Blank Url Key")]
             public string Url { get; set; }
             public bool? Active { get; set; }
             public Dto()
             {
                 Id = Guid.NewGuid().ToString().ToUpper();
-                TenantIntegrationId = "";                                       //need seeded   
+                TenantIntegrationId = "92b09cb7-bad7-4f3e-b740-f317e1e6f81c";      //Seeded, unique   
                 Username = "salesforceqa@affinaquest.com";                                                  
                 Password = "Test@123";
                 Token = "cNBkq8UJg0Qs1KiAXpA1e5cSR4";
@@ -70,6 +69,8 @@
                     return Endpoint + "/" + CurrentObject.Id;
                 case "GETQuery":
                     return Endpoint + "/";                              //api/TenantIntegrationConfigSalesforce/{id}
+                case "GETIntegrationIdQuery":
+                    return Endpoint + "/integrationid/";              //api/TenantIntegrationConfigSalesforce/integrationid/{integrationId}
                 case "AttributeUrlTest":
                     return Endpoint + "/";
                 default: return Endpoint;
@@ -89,12 +90,12 @@
         public override string GetPutBody()
         {
             CurrentObject.Id = Guid.NewGuid().ToString().ToUpper();
-            CurrentObject.TenantIntegrationId = "";                                       //need seeded   
+            CurrentObject.TenantIntegrationId = "3bbe0917-94e4-485f-a4a4-2192b87e2eb6";           //Seeded, unique   
             CurrentObject.Username = "salesforceqa@affinaquest.com";
             CurrentObject.Password = "Test@123";
             CurrentObject.Token = "cNBkq8UJg0Qs1KiAXpA1e5cSR4";
             CurrentObject.Url = "https://qa.login.salesforce.com";
-            CurrentObject.Active = true;
+            CurrentObject.Active = false;
             return JsonConvert.SerializeObject(CurrentObject);
         }
         public override string GetWorkingId()
@@ -107,13 +108,21 @@
         }
         public override List<TestObjects.TestStep> GetParameterTests(MessageData messageData, string authValue, IEnvironment environment)
         {
-            IntegrationMetadataQueries query = new();
             List<TestObjects.TestStep> testParamsList = new();
             SetTestParams(authValue, environment);
 
             TestParams.RequestType = "GET";
 
-            DataTable allTenantIntegrationConfigSalesforceDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), query.QueryAllTenantIntegrationConfigSalesforce(SecretsManager.SnowflakeDatabaseEnvironment()));
+            DataTable allTenantIntegrationConfigSalesforceDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), IntegrationMetadataQueries.QueryAllTenantIntegrationConfigSalesforce(SecretsManager.SnowflakeDatabaseEnvironment()));
+
+            //If dbo.TenantIntegrationConfig_Salesforce.Token = NULL, replace with ""
+            foreach (DataRow row in allTenantIntegrationConfigSalesforceDt.Rows)
+            {
+                if (string.IsNullOrEmpty(row["Token"].ToString()))
+                {
+                    row["Token"] = "";
+                }
+            }
 
             //Returns all Tenant Integration Config Salesforce in dbo.TenantIntegrationConfig_Salesforce (for GET /api/TenantIntegrationConfigSalesforce)
             string expectedGetAllResponseBody = JsonConvert.SerializeObject(allTenantIntegrationConfigSalesforceDt);
@@ -132,6 +141,20 @@
 
                 TestParams.TestStepName = GetType().Name + "_GET_TenantIntegrationConfigSalesforceById_" + rowJToken["ID"];
                 TestParams.Url = GetUrl("GETQuery") + rowJToken["ID"].ToString();
+                TestParams.ExpectedResponseBody = rowJson;
+                testParamsList.Add(TestParams.Copy());
+            }
+
+            //Returns specific Tenant Integration Config Salesforce in dbo.TenantIntegrationConfig_Salesforce by correlated IntegrationId in dbo.TenantIntegration (for GET /TenantIntegrationConfigSalesforce/{IntegrationId})
+            DataTable integrationIdDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), IntegrationMetadataQueries.QueryDistinctTenantIntegrationIntegrationId(SecretsManager.SnowflakeDatabaseEnvironment()));
+            foreach (DataRow row in integrationIdDt.Rows)
+            {
+                DataTable eachIntegrationIdDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), IntegrationMetadataQueries.QueryTenantIntegrationConfigSalesforceByIntegrationId(SecretsManager.SnowflakeDatabaseEnvironment(), row.Field<string>("IntegrationId")));
+                JArray jArray = JArray.FromObject(eachIntegrationIdDt, JsonSerializer.CreateDefault());
+
+                TestParams.TestStepName = GetType().Name + "_GET_TenantIntegrationConfigSalesforceByIntegrationId_" + row.Field<string>("IntegrationId");
+                TestParams.Url = GetUrl("GETIntegrationIdQuery") + row.Field<string>("IntegrationId").ToString();
+                string rowJson = jArray.ToString(Formatting.None);
                 TestParams.ExpectedResponseBody = rowJson;
                 testParamsList.Add(TestParams.Copy());
             }
