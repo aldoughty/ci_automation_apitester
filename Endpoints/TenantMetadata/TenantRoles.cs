@@ -43,7 +43,6 @@
         }
         public override List<TestObjects.TestStep> GetParameterTests(MessageData messageData, string authValue, IEnvironment environment)
         {
-            TenantMetadataQueries query = new();
             List<TestObjects.TestStep> testParamsList = new();
             SetTestParams(authValue, environment);
 
@@ -51,17 +50,17 @@
             TestParams.RequestType = "GET";
 
             //Returns all Tenant Roles in dbo.Tenant (for GET /api/TenantRoles)
-            DataTable allTenantRolesDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), query.QueryAllTenantRoles(SecretsManager.SnowflakeDatabaseEnvironment()));
+            DataTable allTenantRolesDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), TenantMetadataQueries.QueryAllTenantRoles(SecretsManager.SnowflakeDatabaseEnvironment()));
             string expectedGetAllResponseBody = JsonConvert.SerializeObject(allTenantRolesDt);
             TestParams.TestStepName = GetType().Name + "_GET_AllTenantRoles";
             TestParams.ExpectedResponseBody = expectedGetAllResponseBody;
             testParamsList.Add(TestParams.Copy());
 
             //Queries TenantKeys in dbo.Tenant HAVING records in dbo.TenantRoles for GET /api/TenantRoles/{tenantKey} (returns 200 with role(s))
-            DataTable allTenantKeysHavingRolesDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), query.QueryAllTenantKeysHavingTenantRoles(SecretsManager.SnowflakeDatabaseEnvironment()));
+            DataTable allTenantKeysHavingRolesDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), TenantMetadataQueries.QueryAllTenantKeysHavingTenantRoles(SecretsManager.SnowflakeDatabaseEnvironment()));
             foreach (DataRow dataRow in allTenantKeysHavingRolesDt.Rows)
             {
-                DataTable allTenantRolesByTenantIdDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), query.QueryTenantRolesByTenantId(dataRow["TENANTID"].ToString(), SecretsManager.SnowflakeDatabaseEnvironment()));
+                DataTable allTenantRolesByTenantIdDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), TenantMetadataQueries.QueryTenantRolesByTenantId(dataRow["TENANTID"].ToString(), SecretsManager.SnowflakeDatabaseEnvironment()));
 
                 string expectedGetRolesByIdResponseBody = JsonConvert.SerializeObject(allTenantRolesByTenantIdDt);
 
@@ -71,15 +70,15 @@
                 testParamsList.Add(TestParams.Copy());
             }
 
-            //Queries TenantKeys in dbo.Tenant NOT HAVING records in dbo.TenantRoles for GET /api/TenantRoles/{tenantKey} (returns 500 Unable to find role for tenant)
-            DataTable allTenantKeysNotHavingRolesDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), query.QueryAllTenantKeysNotHavingTenantRoles(SecretsManager.SnowflakeDatabaseEnvironment()));
+            //Queries TenantKeys in dbo.Tenant NOT HAVING records in dbo.TenantRoles for GET /api/TenantRoles/{tenantKey} (returns 500 No roles found for tenant)
+            DataTable allTenantKeysNotHavingRolesDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), TenantMetadataQueries.QueryAllTenantKeysNotHavingTenantRoles(SecretsManager.SnowflakeDatabaseEnvironment()));
             foreach (DataRow dataRow in allTenantKeysNotHavingRolesDt.Rows)
             {
                 TestParams.TestType = "ValidateResponseContainsString";
                 TestParams.TestStepName = GetType().Name + "_GET_TenantRolesByTenantKeyNotHavingRoles_" + dataRow["TENANT_KEY"].ToString();
                 TestParams.Url = GetUrl("GETQuery") + dataRow["TENANT_KEY"].ToString();
                 TestParams.ExpectedResponseCode = 500;
-                TestParams.ExpectedResponseBody = "Unable to find role for tenant";
+                TestParams.ExpectedResponseBody = "No roles found for tenant";
                 testParamsList.Add(TestParams.Copy());
             }
 

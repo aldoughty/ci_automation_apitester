@@ -5,30 +5,49 @@
         const string Endpoint = "/api/TenantOrgs";
         public Dto CurrentObject = new();
 
+        //POST OrgId must meet Auth0 Name requirements if Auth0 Launch Darkly flag is enabled
+
+        //This scenario involves 2 properties?
+        //[RequestTest("POST", "{\"tenantId\": \"9d6b9214-23e0-479e-846c-f6048c0c0058\", \"orgId\": \"org_KlOYPcLaAzMYiwzx\"}", 500, "TenantOrg already exists for TenantId 9d6b9214-23e0-479e-846c-f6048c0c0058 and OrgId org_KlOYPcLaAzMYiwzx", "Duplicate Tenant & Org Combo")]
+        //[RequestTest("PUT", "{\"tenantId\": \"9d6b9214-23e0-479e-846c-f6048c0c0058\", \"orgId\": \"org_KlOYPcLaAzMYiwzx\"}", 500, "Another TenantOrg already exists for TenantId 9d6b9214-23e0-479e-846c-f6048c0c0058 and OrgId org_KlOYPcLaAzMYiwzx", "Duplicate Tenant & Org Combo")]
+        
         public class Dto
         {
-            [RequestTest("PUT", null, 400, "The Id field is required", "Omit Id Key")]
-            [RequestTest("PUT", "", 500, "Value cannot be null. (Parameter 'id')", "Blank Id Key")]
+            [RequestTest("PUT", null, 500, "Required input Id was empty", "Omit Id Key")]
+            [RequestTest("PUT", "", 500, "Required input Id was empty", "Blank Id Key")]
+            [RequestTest("PUT", "99999999-9999-9999-9999-999999999999", 500, "TenantOrg with Id 99999999-9999-9999-9999-999999999999 does not exist", "Id Doesn't Exist")]
             [UrlTest("DELETE", "", 405, "", "")]
             [UrlTest("DELETE", "99999999-9999-9999-9999-999999999999", 500, "Error disabling tenant org mapping", "OrgId Doesn't Exist")]
             [UrlTest("GET", "99999999-9999-9999-9999-999999999999", 404, "Sequence contains no elements", "OrgId Doesn't Exist")]
             public string Id { get; set; }
-            [RequestTest("POST", null, 400, "The TenantId field is required", "Omit TenantId Key")]
-            [RequestTest("POST", "", 422, "'Tenant Id' must not be empty", "Blank TenantId Key")]
-            [RequestTest("PUT", null, 400, "The TenantId field is required", "Omit TenantId Key")]
-            [RequestTest("PUT", "", 422, "'Tenant Id' must not be empty", "Blank TenantId Key")]
+            [RequestTest("POST", null, 422, "\\u0027Tenant Id\\u0027 must not be empty", "Omit TenantId Key")]
+            [RequestTest("POST", "", 422, "\\u0027Tenant Id\\u0027 must not be empty", "Blank TenantId Key")]
+            [RequestTest("POST", "non guid", 500, "TenantId is formatted incorrectly or does not exist", "Non GUID TenantId")]
+            [RequestTest("POST", "99999999-9999-9999-9999-999999999999", 500, "TenantId is formatted incorrectly or does not exist", "TenantId Doesn't Exist")]
+            [RequestTest("PUT", null, 422, "\\u0027Tenant Id\\u0027 must not be empty", "Omit TenantId Key")]
+            [RequestTest("PUT", "", 422, "\\u0027Tenant Id\\u0027 must not be empty", "Blank TenantId Key")]
+            [RequestTest("PUT", "non guid", 500, "TenantId is formatted incorrectly or does not exist", "Non GUID TenantId")]
+            [RequestTest("PUT", "99999999-9999-9999-9999-999999999999", 500, "TenantId is formatted incorrectly or does not exist", "TenantId Doesn't Exist")]
             public string TenantId { get; set; }
-            [RequestTest("POST", null, 400, "The OrgId field is required", "Omit OrgId Key")]
-            [RequestTest("POST", "", 422, "'Org Id' must not be empty", "Blank OrgId Key")]
-            [RequestTest("PUT", "", 422, "'Org Id' must not be empty", "Blank OrgId Key")]
-            [RequestTest("PUT", null, 400, "The OrgId field is required", "Omit OrgId Key")]
+            [RequestTest("POST", null, 422, "\\u0027Org Id\\u0027 must not be empty", "Omit OrgId Key")]
+            [RequestTest("POST", "", 422, "\\u0027Org Id\\u0027 must not be empty", "Blank OrgId Key")]
+            [RequestTest("POST", "ab", 422, "The length of \\u0027Org Id\\u0027 must be at least 3 characters", "OrgId Minimum 3 Chars")]
+            [RequestTest("POST", "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ", 422, "The length of \\u0027Org Id\\u0027 must be 50 characters or fewer", "OrgId Maximum 50 Chars")]
+            [RequestTest("POST", "`~!@#$%^*()=+[]{}|;:,./<>?", 422, "OrgId: Must meet the Auth0 Org_name requirements", "OrgId No Special Char Except _-")]
+            [RequestTest("POST", "ABC DEF", 422, "OrgId: Must meet the Auth0 Org_name requirements", "OrgId No Spaces")]
+            [RequestTest("PUT", "", 422, "\\u0027Org Id\\u0027 must not be empty", "Blank OrgId Key")]
+            [RequestTest("PUT", null, 422, "\\u0027Org Id\\u0027 must not be empty", "Omit OrgId Key")]
+            [RequestTest("PUT", "ab", 422, "The length of \\u0027Org Id\\u0027 must be at least 3 characters", "OrgId Minimum 3 Chars")]
+            [RequestTest("PUT", "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ", 422, "The length of \\u0027Org Id\\u0027 must be 50 characters or fewer", "OrgId Maximum 50 Chars")]
+            [RequestTest("PUT", "`~!@#$%^*()=+[]{}|;:,./<>?", 422, "OrgId: Must meet the Auth0 Org_name requirements", "OrgId No Special Char Except _-")]
+            [RequestTest("PUT", "ABC DEF", 422, "OrgId: Must meet the Auth0 Org_name requirements", "OrgId No Spaces")]
             public string OrgId { get; set; }
             public bool? Active { get; set; }
             public Dto()
             {
                 Id = Guid.NewGuid().ToString().ToUpper();
-                TenantId = "9D6B9214-23E0-479E-846C-F6048C0C0058";          //SSB TenantId
-                OrgId = "org_KlOYPcLaAzMYiwzx";                             //SSB OrgId
+                TenantId = "4d4a68cf-6082-4916-8e79-5d8897df7608";          //Seeded TenantId
+                OrgId = "org_UofQAcLaAzMYiwzx";                             
                 Active = true;
             }
         }
@@ -62,8 +81,11 @@
         }
         public override string GetPutBody()
         {
-            CurrentObject.TenantId = "9D6B9214-23E0-479E-846C-F6048C0C0058";        //SSB TenantId
-            CurrentObject.OrgId = "org_KlOYPcLaAzMYiwzx";                           //SSB OrgId
+            CurrentObject.Id = Guid.NewGuid().ToString().ToUpper();
+            CurrentObject.TenantId = "4d4a68cf-6082-4916-8e79-5d8897df7608";        //Seeded TenantId
+            CurrentObject.OrgId = "org_UofQAcLaAzMYiwzx";
+            CurrentObject.Active = false;
+
             return JsonConvert.SerializeObject(CurrentObject);
         }
         public override string GetWorkingId()
@@ -76,7 +98,6 @@
         }
         public override List<TestObjects.TestStep> GetParameterTests(MessageData messageData, string authValue, IEnvironment environment)
         {
-            TenantMetadataQueries query = new();
             List<TestObjects.TestStep> testParamsList = new();
             SetTestParams(authValue, environment);
 
@@ -84,7 +105,7 @@
             TestParams.RequestType = "GET";
 
             //Returns all Tenant Orgs in dbo.TenantOrgs (for GET /api/TenantOrgs)
-            DataTable allTenantOrgsDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), query.QueryAllTenantOrgs(SecretsManager.SnowflakeDatabaseEnvironment()));
+            DataTable allTenantOrgsDt = DataBaseExecuter.ExecuteCommand("Snowflake", SecretsManager.SnowflakeConnectionString(), TenantMetadataQueries.QueryAllTenantOrgs(SecretsManager.SnowflakeDatabaseEnvironment()));
             
             string expectedGetAllResponseBody = JsonConvert.SerializeObject(allTenantOrgsDt);
             TestParams.TestStepName = GetType().Name + "_GET_AllTenantOrgs";
