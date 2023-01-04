@@ -10,7 +10,7 @@ namespace ci_automation_apitester.Objects
             Active = new Dictionary<string, bool>()
 
             {
-                //DataTagging
+                //DataTagging  ***Turned off until we go back to it
                 { "DataTagging.Admin", false },                //NOTE: Auth is turned completely off for this endpoint, so Auth tests expecting 401 will fail with 200s
                 { "DataTagging.ColumnDefinition", false },     //NOTE: Endpoint is turned off because Type is returning as NULL only on GET of specific ColumnDefinitionId in GetParameterTests
                 { "DataTagging.ColumnType", false },
@@ -23,21 +23,23 @@ namespace ci_automation_apitester.Objects
                 { "DataTagging.TenantSaveScheme", false },
                 
                 //IntegrationMetadata
-                { "IntegrationMetadata.Integration", true },  
-                { "IntegrationMetadata.IntegrationEndpoint", true },                     //BUGS for POST, PUT, GET by ID
-                { "IntegrationMetadata.IntegrationType", true },                         
-                { "IntegrationMetadata.TenantIntegration", true },                       //requires seeded data script
-                { "IntegrationMetadata.TenantIntegrationConfigEloquaCIDT", false },      //BUG #300 POST returns tenantIntegrationConfigId instead of Id.  Breaks swapping ID for subsequent calls.  Also, has other validation issues.
-                { "IntegrationMetadata.TenantIntegrationConfigSalesforce", false },      //current execution errors
-                { "IntegrationMetadata.TenantIntegrationConfigSFTP", false },            //current execution errors
-                { "IntegrationMetadata.TenantIntegrationConfigTM", false },              //current execution errors
-                { "IntegrationMetadata.TenantIntegrationEndpoint", false },              //current execution errors due to need seeded data
-                { "IntegrationMetadata.TenantSFTP", false },                             //Bug #288 500 on valid PUT (workflow/auth tests failing)
+                { "IntegrationMetadata.Integration", false },  
+                { "IntegrationMetadata.IntegrationEndpoint", false },                    
+                { "IntegrationMetadata.IntegrationTenant", false },
+                { "IntegrationMetadata.IntegrationType", false },
+                { "IntegrationMetadata.TenantGPG", false },
+                { "IntegrationMetadata.TenantIntegration", false },
+                { "IntegrationMetadata.TenantIntegrationConfigEloquaCIDT", false },      //turned off bc we're reworking to just have one CIDT endpoint
+                { "IntegrationMetadata.TenantIntegrationConfigSalesforce", false },      //PUTs are failing for existing TenantIntegrationId
+                { "IntegrationMetadata.TenantIntegrationConfigSFTP", false },            
+                { "IntegrationMetadata.TenantIntegrationConfigTM", false },
+                { "IntegrationMetadata.TenantIntegrationEndpoint", true },              //BUGS?
+                { "IntegrationMetadata.TenantSFTP", false },                                                    
 
-                //TenantMetadata  //true
-                { "TenantMetadata.TenantOrgs", true },
-                { "TenantMetadata.TenantRoles", true },
-                { "TenantMetadata.Tenants", true },
+                //TenantMetadata
+                { "TenantMetadata.TenantOrgs", false }, 
+                { "TenantMetadata.TenantRoles", false },
+                { "TenantMetadata.Tenants", false },                                     
             };
         }
         public bool GetEndpointIsActive(string endpoints)
@@ -45,6 +47,14 @@ namespace ci_automation_apitester.Objects
             if (!Active.ContainsKey(endpoints)) return true;
 
             return Active[endpoints];
+        }
+        public static IEnumerable<string> GetActiveEndpoints()
+        {
+            ActiveTests ActiveTests = new ActiveTests();
+            
+            IEnumerable<string> keys = ActiveTests.Active.Where(x => x.Value == true).Select(x => x.Key);
+
+            return keys;
         }
     }
 }

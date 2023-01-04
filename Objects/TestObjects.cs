@@ -19,6 +19,10 @@
             public bool PerformCleanup { get; set; }
             public bool SwapGUID { get; set; }
             public bool GetGUID { get; set; }
+            public bool GetObjectCount { get; set; }
+            public bool ValidateObjectCount { get; set; }
+            public int ExpectedObjectCountIncrease { get; set; }
+            public int CurrentObjectCount { get; set; }
 
             public TestStep Create(string testType, string testStepName, Dictionary<string, string> headers, string url, string requestType, string body, int expectedResponseCode, string expectedResponseBody)
             {
@@ -52,6 +56,17 @@
             public TestStep GetGuid()
             {
                 GetGUID = true;
+                return this;
+            }
+            public TestStep GetExpectedObjectCount(int num)
+            {
+                GetObjectCount = true;
+                ExpectedObjectCountIncrease = num;
+                return this;
+            }
+            public TestStep ValidateActualObjectCount()
+            {
+                ValidateObjectCount = true;
                 return this;
             }
         }

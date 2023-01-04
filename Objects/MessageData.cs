@@ -16,6 +16,7 @@
         public string SnowflakeWarehouse { get; set; }
         public string TenantId { get; set; }
         public string CurrentId { get; set; }
+        public int CurrentObjectCount { get; set; }
 
         public MessageData()
         {
