@@ -1,8 +1,9 @@
-﻿namespace ci_automation_apitester
+﻿using System.Configuration;
+
+namespace ci_automation_apitester
 {
     public class ExecuteTests
     {
-        //static int Main(string[] args)
 
         static int Main()
         {
@@ -17,15 +18,21 @@
 
             try
             {
+                TestSetupAndTeardown.RunTestSetup();
                 GenerateTests generateTests = new GenerateTests(testParameters);
                 TestPlan testPlan = generateTests.GenerateApiTests(testParameters);
+
                 timer.Start();
                 logger.Information("Kicking off Automation_Execute_ApiTesterTests.  Message received {@Message}", messageData);
 
                 foreach (TestSuiteList testSuiteList in testPlan.TestSuiteList)
                 {
+
                     foreach (TestSuite testSuite in testSuiteList.TestSuite)
                     {
+                        testParameters["EndpointUnderTest"] = "ci_automation_apitester.ApiDto." + testSuite.EndpointUnderTest;
+                        IRestApi EndpointUnderTest = (IRestApi)Activator.CreateInstance(Type.GetType(testParameters["EndpointUnderTest"].ToString()));
+
                         foreach (TestCase testCase in testSuite.TestCaseList)
                         {
                             foreach (TestStep testStep in testCase.TestStep)
@@ -33,8 +40,6 @@
                                 testParameters["Request"] = testStep;
                                 TestObjects.TestStep Request = testParameters.ContainsKey("Request") ? (TestObjects.TestStep)testParameters["Request"] : new TestObjects.TestStep();
                                 testParameters["TestResultDetail"] = new ApiTestResults.RequestData(testCase, testStep);
-                                testParameters["EndpointUnderTest"] = "ci_automation_apitester.ApiDto." + testSuite.EndpointUnderTest;
-                                IRestApi EndpointUnderTest = (IRestApi)Activator.CreateInstance(Type.GetType(testParameters["EndpointUnderTest"].ToString()));
                                 HttpResponseMessage Response = new();
                                 bool exceptionOccurred = false;
                                 try
@@ -52,7 +57,6 @@
 
                                             if (Request.RequestType.ToUpper() == "PUT")
                                             {
-
                                                 string primaryKey = JObject.Parse(Request.Body).First.First.Path;  //allows for Primary Keys that may not be "Id" in response
                                                 dynamic jsonObj = JsonConvert.DeserializeObject(Request.Body);
                                                 jsonObj[primaryKey] = messageData.CurrentId;
@@ -95,6 +99,14 @@
 
                                     if (Request.PerformCleanup) EndpointUnderTest.CleanUp(messageData, messageData.CurrentId);
 
+                                    if (Request.GetObjectCount) 
+                                    {
+                                        string content = Response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                                        JArray jArrayResponse = (JArray)JsonConvert.DeserializeObject(content);
+                                        messageData.CurrentObjectCount = jArrayResponse.Count + Request.ExpectedObjectCountIncrease; 
+                                    }
+                                    
+                                    if (Request.ValidateObjectCount) {  Request.CurrentObjectCount = messageData.CurrentObjectCount; }
 
                                     if (!exceptionOccurred)
                                     {
@@ -111,6 +123,7 @@
                             }
                         }
                     }
+
                 }
                 timer.Stop();
                 testResults.SecondsToExecute = Convert.ToInt32(timer.ElapsedMilliseconds / 1000);
@@ -121,6 +134,7 @@
                 logger.Verbose("Number of Tests Failed: {@Num}", testResults.NumberTestsFailed);
                 logger.Verbose("Number of Tests Warnings: {@Num}", testResults.NumberTestsWithWarning);
                 logger.Verbose("Number of Tests Errors: {@Num}", testResults.NumberTestsWithError);
+                TestSetupAndTeardown.RunTestTeardown();
                 return 0;
 
             }
@@ -130,6 +144,7 @@
 
                 logger.Fatal("Exception Message: {@Message}", e.Message);
                 logger.Fatal("Exception StackTrace: {@Exception}", e.StackTrace);
+                TestSetupAndTeardown.RunTestTeardown();
                 return 1;
             }
         }
