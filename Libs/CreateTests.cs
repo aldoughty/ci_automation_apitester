@@ -143,13 +143,15 @@
             List<TestStep> testStepList = new();
             TestCase testCase = new();
             List<TestCase> testCaseList = new();
-            RequestAttributeTest attributeTest = new();
             List<RequestAttributeTest> requestAttributeTestList = ApiDto.GetRequestAttributeTests();
             List<UrlAttributeTest> urlAttributeTestList = ApiDto.GetUrlAttributeTests();
 
             foreach (var test in requestAttributeTestList)
             {
-                testStepList.Add(testStep.Create("ValidateResponseContainsString", test.Action + "_" + baseTestName + "_RequestAttributeTest_" + test.TestName + "_" + test.ResponseCode, ApiDto.GetHeaders(AuthValue, Environment), BaseUrl + ApiDto.GetUrl(test.Action), test.Action, test.Request, test.ResponseCode, "").Copy());
+                //Validates PUT/POST error scenarios and that a record IS NOT created as a result
+                testStepList.Add(testStep.Create("ValidateResponseCode", "GET_" + baseTestName + "_RequestAttributeTest_" + test.TestName + "_Get Initial Object Count", ApiDto.GetHeaders(AuthValue, Environment), BaseUrl + ApiDto.GetUrl("GET"), "GET", test.Request, 200, "").Copy().GetExpectedObjectCount(0));
+                testStepList.Add(testStep.Create("ValidateResponseContainsString", test.Action + "_" + baseTestName + "_RequestAttributeTest_" + test.TestName + "_" + test.ResponseCode, ApiDto.GetHeaders(AuthValue, Environment), BaseUrl + ApiDto.GetUrl(test.Action), test.Action, test.Request, test.ResponseCode, test.Message).Copy());
+                testStepList.Add(testStep.Create("ValidateResponseObjectCounts", "GET_" + baseTestName + "_RequestAttributeTest_" + test.TestName + "_Get Final Object Count", ApiDto.GetHeaders(AuthValue, Environment), BaseUrl + ApiDto.GetUrl("GET"), "GET", test.Request, 200, "").Copy().ValidateActualObjectCount());
             }
 
             foreach (var test in urlAttributeTestList)

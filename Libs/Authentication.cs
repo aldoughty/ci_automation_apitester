@@ -62,7 +62,7 @@
             //InvalidApiKey, ExpiredBearerToken & NoAuthValue must be last bc they are failures for all actions and
             //we need a 200 POST to update the CurrentId for subsequent calls.
 
-            { "ValidBearerValidApiKey", "ValidBearerInvalidApiKey", "InvalidBearerInvalidApiKey", "InvalidBearerValidApiKey", "InvalidApiKey", "ExpiredBearerToken", "NoAuthValue" };
+            { "ValidBearer", "ValidBearerValidApiKey", "ValidBearerInvalidApiKey", "InvalidBearerInvalidApiKey", "InvalidBearerValidApiKey", "InvalidApiKey", "ExpiredBearerToken", "NoAuthValue" };
 
             return authCombos;
         }
@@ -91,10 +91,14 @@
                     }
                 );
 
-                foreach (string authCombo in authCombos) //"InvalidApiKey", "ExpiredBearerToken", "NoAuthValue", "ValidBearerInvalidApiKey", "InvalidBearerInvalidApiKey", "InvalidBearerValidApiKey", "ValidBearerValidApiKey" 
+                foreach (string authCombo in authCombos) //"InvalidApiKey", "ExpiredBearerToken", "NoAuthValue", "ValidBearer", "ValidBearerInvalidApiKey", "InvalidBearerInvalidApiKey", "InvalidBearerValidApiKey", "ValidBearerValidApiKey" 
                 {
                     switch (authCombo)
                     {
+                        case "ValidBearer":
+                            responseCode = 200;
+                            headers["Authorization"] = Authentication.GetAuthenticationToken(environment);
+                            break;
                         case "InvalidApiKey":
                             responseCode = 401;
                             headers["ApiKey"] = invalidApiKey;

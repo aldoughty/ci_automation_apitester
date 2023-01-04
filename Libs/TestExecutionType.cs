@@ -49,7 +49,7 @@
             if (Request.ExpectedResponseBody != "" && TestResultDetail.Status == TestResults.Status.Passed)
             {
                var content = Response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-               ValidateErrorHandling(TestResultDetail, "ValidateContainsResponseBody", content, Request.ExpectedResponseBody);
+               ValidateErrorHandling(TestResultDetail, "ValidateEquivalentResponseBody", content, Request.ExpectedResponseBody);
             }
                 
             return TestResultDetail;
@@ -65,8 +65,12 @@
         }
         public ApiTestResults.TestDetails ValidateResponseObjectCounts()
         {
-            ValidateErrorHandling(TestResultDetail, "ValidateResponseObjectCounts", Response.StatusCode, Request.ExpectedResponseCode);
-            
+
+            string content = Response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            JArray jArrayResponse = (JArray)JsonConvert.DeserializeObject(content);
+            int actualResponseBodyCount = jArrayResponse.Count;
+            ValidateErrorHandling(TestResultDetail, "ValidateResponseObjectCounts", actualResponseBodyCount, Request.CurrentObjectCount);
+
             return TestResultDetail;
         }
         private void ValidateResponseCode(HttpStatusCode actualResponseCode, HttpStatusCode expectedResponseCode)
@@ -86,9 +90,9 @@
         {
             actualResponseBody.Should().BeEquivalentTo(expectedResponseBody);
         }
-        private void ValidateResponseObjectCounts(string actualResponseBody, string expectedResponseBody)
+        private void ValidateResponseObjectCounts(int actualResponseBodyCount, int expectedResponseBodyCount)
         {
-            //TODO
+            actualResponseBodyCount.Should().Be(expectedResponseBodyCount);
         }
         private void ValidateErrorHandling(ApiTestResults.TestDetails testDetail, string test, object actualResult, object expectedResult)
         {
@@ -109,7 +113,7 @@
                         ValidateContainsResponseBody((string)actualResult, (string)expectedResult);
                         break;
                     case "ValidateResponseObjectCounts":
-                        ValidateResponseObjectCounts((string)actualResult, (string)expectedResult);
+                        ValidateResponseObjectCounts((int)actualResult, (int)expectedResult);
                         break;
                 }
                 TestResultDetail.Status = TestResults.Status.Passed;
