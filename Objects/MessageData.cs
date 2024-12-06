@@ -22,7 +22,7 @@
         {
             IConfiguration settings = SettingsConfig.Get();
             StandardTestParameters = new StandardTestParameters();
-            StandardTestParameters.AutomationMiroService = GetType().Namespace;
+            StandardTestParameters.AutomationMicroService = GetType().Namespace;
             StandardTestParameters.LocalLogs = Convert.ToBoolean(SettingsHandler.GetSettingString("LocalLogs", settings));
         }
         public void ValidateContent()
